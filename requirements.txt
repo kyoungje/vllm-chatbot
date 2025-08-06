@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+vllm
+gradio
+requests
+httpx
