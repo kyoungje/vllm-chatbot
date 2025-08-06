@@ -4,6 +4,7 @@ from vllm.engine.async_llm_engine import AsyncLLMEngine
 from vllm.sampling_params import SamplingParams
 from vllm.utils import random_uuid
 from pydantic import BaseModel
+from typing import List, Optional
 
 app = FastAPI()
 
@@ -20,18 +21,34 @@ engine_args = AsyncEngineArgs(
     dtype="float16")
 engine = AsyncLLMEngine.from_engine_args(engine_args)
 
+class Message(BaseModel):
+    role: str  # "user" or "assistant"
+    content: str
+
 class PromptRequest(BaseModel):
     prompt: str
     system_prompt: str
+    history: Optional[List[Message]] = []
 
 @app.post("/generate")
 async def generate(request: PromptRequest):
     # Set the stop parameter in SamplingParams to stop generation after the first answer:
-    sampling_params = SamplingParams(temperature=0.7, top_p=0.95, max_tokens=256, stop=["\nUser:"])
+    sampling_params = SamplingParams(temperature=0.7, top_p=0.95, max_tokens=256,  stop=["User:", "System:", "Assistant:"])
     request_id = random_uuid()
+    
+    # Build conversation history
+    history_str = ""
+    if request.history:
+        for msg in request.history:
+            if msg.role == "user":
+                history_str += f"User: {msg.content}\n"
+            elif msg.role == "assistant":
+                history_str += f"Assistant: {msg.content}\n"
+
     full_prompt = (
         f"You are a helpful assistant.\n"            
         f"{request.system_prompt}\n"
+        f"{history_str}"
         f"User: {request.prompt}\n"
         f"Assistant:"
     )
