@@ -12,8 +12,11 @@ python3 -m venv .venv
 
 source .venv/bin/activate
 
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
+
+### vLLM instalation
+Refer to this [official document](https://docs.vllm.ai/en/stable/getting_started/installation/gpu.html#nvidia-cuda).
 
 ## Run
 
