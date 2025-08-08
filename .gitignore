@@ -207,3 +207,7 @@ marimo/_lsp/
 __marimo__/
 
 fine-tuning/*.jsonl
+fine-tuning/outputs
+fine-tuning/unsloth_compiled_cache
+fine-tuning/Meta*
+
